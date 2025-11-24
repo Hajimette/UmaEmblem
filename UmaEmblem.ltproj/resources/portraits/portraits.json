@@ -658,5 +658,77 @@
             40
         ],
         "info_offset": 0
+    },
+    {
+        "nid": "Suzuka",
+        "blinking_offset": [
+            24,
+            32
+        ],
+        "smiling_offset": [
+            24,
+            40
+        ],
+        "info_offset": 0
+    },
+    {
+        "nid": "image (7)",
+        "blinking_offset": [
+            24,
+            24
+        ],
+        "smiling_offset": [
+            24,
+            40
+        ],
+        "info_offset": 0
+    },
+    {
+        "nid": "Satono Diamond V1",
+        "blinking_offset": [
+            24,
+            32
+        ],
+        "smiling_offset": [
+            24,
+            48
+        ],
+        "info_offset": 0
+    },
+    {
+        "nid": "image (3)",
+        "blinking_offset": [
+            24,
+            24
+        ],
+        "smiling_offset": [
+            24,
+            40
+        ],
+        "info_offset": 0
+    },
+    {
+        "nid": "Maruzensky",
+        "blinking_offset": [
+            24,
+            32
+        ],
+        "smiling_offset": [
+            16,
+            48
+        ],
+        "info_offset": 0
+    },
+    {
+        "nid": "kitasan",
+        "blinking_offset": [
+            24,
+            32
+        ],
+        "smiling_offset": [
+            24,
+            48
+        ],
+        "info_offset": 0
     }
 ]
