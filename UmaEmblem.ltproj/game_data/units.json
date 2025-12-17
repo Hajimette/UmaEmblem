@@ -1,0 +1,427 @@
+[
+    {
+        "nid": "Symboli",
+        "name": "Symboli Rudolf",
+        "desc": "\"Fortune smiles upon the brave.\"",
+        "variant": null,
+        "level": 1,
+        "klass": "Eirika_Lord",
+        "tags": [
+            "Lord"
+        ],
+        "bases": {
+            "HP": 16,
+            "STR": 4,
+            "MAG": 2,
+            "SKL": 8,
+            "SPD": 9,
+            "LCK": 5,
+            "DEF": 3,
+            "CON": 5,
+            "MOV": 5,
+            "RES": 1
+        },
+        "growths": {
+            "HP": 70,
+            "STR": 35,
+            "MAG": 5,
+            "SKL": 500,
+            "SPD": 40,
+            "LCK": 30,
+            "DEF": 45,
+            "CON": 0,
+            "MOV": 0,
+            "RES": 45
+        },
+        "stat_cap_modifiers": {},
+        "starting_items": [
+            [
+                "Vulnerary",
+                false
+            ],
+            [
+                "Rapier",
+                false
+            ]
+        ],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {
+            "Sword": [
+                true,
+                1,
+                251
+            ],
+            "Lance": [
+                false,
+                0,
+                251
+            ],
+            "Axe": [
+                false,
+                0,
+                251
+            ],
+            "Bow": [
+                false,
+                0,
+                251
+            ],
+            "Staff": [
+                false,
+                0,
+                251
+            ],
+            "Light": [
+                false,
+                0,
+                251
+            ],
+            "Anima": [
+                false,
+                0,
+                251
+            ],
+            "Dark": [
+                false,
+                0,
+                251
+            ],
+            "Default": [
+                false,
+                0,
+                251
+            ]
+        },
+        "alternate_classes": [],
+        "portrait_nid": "Eirika",
+        "affinity": "Light",
+        "fields": []
+    },
+    {
+        "nid": "CB",
+        "name": "Mr. CB",
+        "desc": "\"When the races starts, the \nworld is ours. Right?\"",
+        "variant": null,
+        "level": 1,
+        "klass": "Paladin",
+        "tags": [],
+        "bases": {
+            "HP": 30,
+            "STR": 14,
+            "MAG": 7,
+            "SKL": 13,
+            "SPD": 12,
+            "LCK": 13,
+            "DEF": 11,
+            "CON": 11,
+            "MOV": 8,
+            "RES": 8
+        },
+        "growths": {
+            "HP": 90,
+            "STR": 50,
+            "MAG": 25,
+            "SKL": 45,
+            "SPD": 45,
+            "LCK": 25,
+            "DEF": 40,
+            "CON": 0,
+            "MOV": 0,
+            "RES": 30
+        },
+        "stat_cap_modifiers": {},
+        "starting_items": [
+            [
+                "Steel_Sword",
+                false
+            ],
+            [
+                "Silver_Lance",
+                false
+            ],
+            [
+                "Vulnerary",
+                false
+            ]
+        ],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {
+            "Sword": [
+                true,
+                181,
+                251
+            ],
+            "Lance": [
+                true,
+                181,
+                251
+            ],
+            "Axe": [
+                false,
+                0,
+                251
+            ],
+            "Bow": [
+                false,
+                0,
+                251
+            ],
+            "Staff": [
+                false,
+                0,
+                251
+            ],
+            "Light": [
+                false,
+                0,
+                251
+            ],
+            "Anima": [
+                false,
+                0,
+                251
+            ],
+            "Dark": [
+                false,
+                0,
+                251
+            ],
+            "Default": [
+                false,
+                0,
+                251
+            ]
+        },
+        "alternate_classes": [],
+        "portrait_nid": "Seth",
+        "affinity": "Anima",
+        "fields": []
+    },
+    {
+        "nid": "Katsuragi",
+        "name": "Katsuragi Ace",
+        "desc": "\"I'll break through all the\nwalls and conventions!\"",
+        "variant": null,
+        "level": 1,
+        "klass": "Cavalier",
+        "tags": [],
+        "bases": {
+            "HP": 20,
+            "STR": 7,
+            "MAG": 3,
+            "SKL": 5,
+            "SPD": 7,
+            "LCK": 2,
+            "DEF": 6,
+            "CON": 9,
+            "MOV": 7,
+            "RES": 1
+        },
+        "growths": {
+            "HP": 70,
+            "STR": 35,
+            "MAG": 5,
+            "SKL": 500,
+            "SPD": 40,
+            "LCK": 30,
+            "DEF": 45,
+            "CON": 0,
+            "MOV": 0,
+            "RES": 45
+        },
+        "stat_cap_modifiers": {},
+        "starting_items": [
+            [
+                "Iron_Sword",
+                false
+            ],
+            [
+                "Iron_Lance",
+                false
+            ],
+            [
+                "Vulnerary",
+                false
+            ],
+            [
+                "Vulnerary",
+                false
+            ]
+        ],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {
+            "Sword": [
+                true,
+                1,
+                251
+            ],
+            "Lance": [
+                true,
+                31,
+                251
+            ],
+            "Axe": [
+                false,
+                0,
+                251
+            ],
+            "Bow": [
+                false,
+                0,
+                251
+            ],
+            "Staff": [
+                false,
+                0,
+                251
+            ],
+            "Light": [
+                false,
+                0,
+                251
+            ],
+            "Anima": [
+                false,
+                0,
+                251
+            ],
+            "Dark": [
+                false,
+                0,
+                251
+            ],
+            "Default": [
+                false,
+                0,
+                251
+            ]
+        },
+        "alternate_classes": [],
+        "portrait_nid": "Franz",
+        "affinity": "Light",
+        "fields": []
+    },
+    {
+        "nid": "Silence",
+        "name": "Silence Suzuka",
+        "desc": "",
+        "variant": null,
+        "level": 1,
+        "klass": "Citizen",
+        "tags": [],
+        "bases": {},
+        "growths": {},
+        "stat_cap_modifiers": {},
+        "starting_items": [],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {},
+        "alternate_classes": [],
+        "portrait_nid": "Suzuka",
+        "affinity": "None",
+        "fields": []
+    },
+    {
+        "nid": "Tachyon",
+        "name": "Agnes Tachyon",
+        "desc": "",
+        "variant": null,
+        "level": 1,
+        "klass": "Citizen",
+        "tags": [],
+        "bases": {},
+        "growths": {},
+        "stat_cap_modifiers": {},
+        "starting_items": [],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {},
+        "alternate_classes": [],
+        "portrait_nid": "image (7)",
+        "affinity": null,
+        "fields": []
+    },
+    {
+        "nid": "Diamond",
+        "name": "Satono Diamond",
+        "desc": "",
+        "variant": null,
+        "level": 1,
+        "klass": "Citizen",
+        "tags": [],
+        "bases": {},
+        "growths": {},
+        "stat_cap_modifiers": {},
+        "starting_items": [],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {},
+        "alternate_classes": [],
+        "portrait_nid": "Satono Diamond V1",
+        "affinity": null,
+        "fields": []
+    },
+    {
+        "nid": "Nature",
+        "name": "Nice Nature",
+        "desc": "",
+        "variant": null,
+        "level": 1,
+        "klass": "Citizen",
+        "tags": [],
+        "bases": {},
+        "growths": {},
+        "stat_cap_modifiers": {},
+        "starting_items": [],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {},
+        "alternate_classes": [],
+        "portrait_nid": "image (3)",
+        "affinity": null,
+        "fields": []
+    },
+    {
+        "nid": "Maruzensky",
+        "name": "Maruzensky",
+        "desc": "",
+        "variant": null,
+        "level": 1,
+        "klass": "Citizen",
+        "tags": [],
+        "bases": {},
+        "growths": {},
+        "stat_cap_modifiers": {},
+        "starting_items": [],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {},
+        "alternate_classes": [],
+        "portrait_nid": "Maruzensky",
+        "affinity": null,
+        "fields": []
+    },
+    {
+        "nid": "Black",
+        "name": "Kitasan Black",
+        "desc": "",
+        "variant": null,
+        "level": 1,
+        "klass": "Citizen",
+        "tags": [],
+        "bases": {},
+        "growths": {},
+        "stat_cap_modifiers": {},
+        "starting_items": [],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {},
+        "alternate_classes": [],
+        "portrait_nid": "kitasan",
+        "affinity": null,
+        "fields": []
+    }
+]
