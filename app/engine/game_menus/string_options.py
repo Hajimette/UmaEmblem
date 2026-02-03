@@ -185,7 +185,7 @@ class BasicPortraitOption(BaseOption[str]):
     def draw(self, surf, x, y):
         portrait = RESOURCES.portraits.get(self._value)
         if portrait:
-            main_portrait_coords = (0, 0, 96, 80)
+            main_portrait_coords = (0, 0, portrait.image.get_width() - 32, portrait.image.get_height - 32)
             if not portrait.image:
                 portrait.image = engine.image_load(portrait.full_path)
             portrait.image = portrait.image.convert()

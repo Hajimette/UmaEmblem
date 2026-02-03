@@ -44,9 +44,29 @@ class EventPortrait():
             self.portrait.image = engine.image_load(self.portrait.full_path)
         self.width = self.portrait.image.get_width()
         self.height = self.portrait.image.get_height()
+        self.main_portrait_coords = (0, 0, self.width - 32, self.height - 32)
+        self.chibi_coords = (self.width - 32, self.height - 96, 32, 32)
+        self.leftwink = (self.width - 32, self.height - 48, 16, 16)
+        self.rightwink = (self.width - 16, self.height - 48, 16, 16)
+        self.halfblink = (self.width - 32, self.height - 64, 32, 16)
+        self.fullblink = (self.width - 32, self.height - 48, 32, 16)
+        self.openmouth = (self.width - 128, self.height - 16, 32, 16)
+        self.halfmouth = (self.width - 96, self.height - 16, 32, 16)
+        self.closemouth = (self.width - 64, self.height - 16, 32, 16)
+        self.opensmile = (self.width - 128, self.height - 32, 32, 16)
+        self.halfsmile = (self.width - 96, self.height - 32, 32, 16)
+        self.closesmile = (self.width - 64, self.height - 32, 32, 16)
         self.portrait.image = self.portrait.image.convert()
         engine.set_colorkey(self.portrait.image, COLORKEY, rleaccel=True)
         self.position = position
+        # Adjust position for expansion
+        if self.width > 128:
+            if self.position[0] > 120:
+                self.position = (self.position[0] - (self.width - 128) // 2, self.position[1])
+            else:
+                self.position = (self.position[0] + (self.width - 128) // 2, self.position[1])
+        if self.height > 112:
+            self.position = (self.position[0], self.position[1] - self.height + 112)
         self.priority = priority
         self.transition = transition
         self.transition_speed = self.base_transition_speed * max(speed_mult, 0.001)

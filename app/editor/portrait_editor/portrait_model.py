@@ -27,7 +27,7 @@ def get_chibi(portrait_nid):
         return None
     if not res.pixmap:
         res.pixmap = QPixmap(res.full_path)
-    pixmap = res.pixmap.copy(res.pixmap.width() - 32, 16, 32, 32)
+    pixmap = res.pixmap.copy(res.pixmap.width() - 32, res.pixmap.height() - 96, 32, 32)
     pixmap = QPixmap.fromImage(editor_utilities.convert_colorkey(pixmap.toImage()))
     return pixmap
 
@@ -46,9 +46,9 @@ def auto_frame_portrait(portrait: PortraitPrefab):
     if not portrait.pixmap:
         portrait.pixmap = QPixmap(portrait.full_path)
     pixmap = portrait.pixmap
-    blink_frame1 = QImage(pixmap.copy(pixmap.width() - 32, 48, 32, 16))
+    blink_frame1 = QImage(pixmap.copy(pixmap.width() - 32, pixmap.width() - 64, 32, 16))
     mouth_frame1 = QImage(pixmap.copy(pixmap.width() - 32, pixmap.height() - 32, 32, 16))
-    main_frame = QImage(pixmap.copy(0, 0, 96, 80))
+    main_frame = QImage(pixmap.copy(0, 0, pixmap.width() - 32, pixmap.height() - 32))
     best_blink_similarity = width * height * 128**3
     best_mouth_similarity = width * height * 128**3
     best_blink_pos = [0, 0]
@@ -99,13 +99,11 @@ def create_new(window):
                 nid = os.path.split(fn)[-1][:-4]
                 pix = QPixmap(fn)
                 nid = str_utils.get_next_name(nid, [d.nid for d in RESOURCES.portraits])
-                if pix.width() == PORTRAIT_WIDTH and pix.height() == PORTRAIT_HEIGHT:
-                    # Swap to use colorkey color if it's not
-                    new_portrait = PortraitPrefab(nid, fn, pix)
-                    auto_colorkey(new_portrait)
-                    auto_frame_portrait(new_portrait)
-                else:
-                    QMessageBox.critical(window, "Error", "Image is not correct size (128x112 px)")
+                # Swap to use colorkey color if it's not
+                new_portrait = PortraitPrefab(nid, fn, pix)
+                auto_colorkey(new_portrait)
+                auto_frame_portrait(new_portrait)
+
             else:
                 QMessageBox.critical(window, "File Type Error!", "Portrait must be PNG format!")
         parent_dir = os.path.split(fns[-1])[0]
@@ -150,7 +148,7 @@ class PortraitModel(ResourceCollectionModel):
             if not portrait.pixmap:
                 portrait.pixmap = QPixmap(portrait.full_path)
             pixmap = portrait.pixmap
-            chibi = pixmap.copy(pixmap.width() - 32, 16, 32, 32)
+            chibi = res.pixmap.copy(res.pixmap.width() - 32, res.pixmap.height() - 96, 32, 32)
             chibi = QPixmap.fromImage(editor_utilities.convert_colorkey(chibi.toImage()))
             return QIcon(chibi)
         elif role == Qt.EditRole:

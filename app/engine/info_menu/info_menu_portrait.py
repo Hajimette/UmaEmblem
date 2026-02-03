@@ -18,6 +18,10 @@ class InfoMenuPortrait():
         if not self.portrait.image:
             self.portrait.image = engine.image_load(self.portrait.full_path)
         self.portrait.image = self.portrait.image.convert()
+        self.main_portrait_coords = (0, 0, self.portrait.image.get_width() - 32, self.portrait.image.get_height() - 32)
+        self.halfblink = (self.portrait.image.get_width() - 32, self.portrait.image.get_height() - 64, 32, 16)
+        self.fullblink = (self.portrait.image.get_width() - 32, self.portrait.image.get_height() - 48, 32, 16)
+        self.stat_screen_mouth_coords = (self.portrait.image.get_width() - 32, self.portrait.image.get_height() - 32, 32, 16)
         engine.set_colorkey(self.portrait.image, COLORKEY, rleaccel=True)
         self.main_portrait = engine.subsurface(self.portrait.image, self.main_portrait_coords)
         self.mouth_section = engine.subsurface(self.portrait.image, self.stat_screen_mouth_coords)
