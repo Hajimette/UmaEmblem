@@ -180,7 +180,7 @@ def draw_portrait(surf, unit, topleft=None, bottomright=None):
 def get_chibi(portrait):
     if not portrait.image:
         portrait.image = engine.image_load(portrait.full_path)
-    image = engine.subsurface(portrait.image, (portrait.image.get_width() - 32, 16, 32, 32))
+    image = engine.subsurface(portrait.image, (portrait.image.get_width() - 32, portrait.image.get_height() - 96, 32, 32))
     image = image.convert()
     engine.set_colorkey(image, COLORKEY, rleaccel=True)
     return image

@@ -59,6 +59,14 @@ class EventPortrait():
         self.portrait.image = self.portrait.image.convert()
         engine.set_colorkey(self.portrait.image, COLORKEY, rleaccel=True)
         self.position = position
+        # Adjust position for expansion
+        if self.width > 128:
+            if self.position[0] > 120:
+                self.position = (self.position[0] - (self.width - 128) // 2, self.position[1])
+            else:
+                self.position = (self.position[0] + (self.width - 128) // 2, self.position[1])
+        if self.height > 112:
+            self.position = (self.position[0], self.position[1] - self.height + 112)
         self.priority = priority
         self.transition = transition
         self.transition_speed = self.base_transition_speed * max(speed_mult, 0.001)
