@@ -46,7 +46,7 @@ def auto_frame_portrait(portrait: PortraitPrefab):
     if not portrait.pixmap:
         portrait.pixmap = QPixmap(portrait.full_path)
     pixmap = portrait.pixmap
-    blink_frame1 = QImage(pixmap.copy(pixmap.width() - 32, res.pixmap.width() - 64, 32, 16))
+    blink_frame1 = QImage(pixmap.copy(pixmap.width() - 32, pixmap.width() - 64, 32, 16))
     mouth_frame1 = QImage(pixmap.copy(pixmap.width() - 32, pixmap.height() - 32, 32, 16))
     main_frame = QImage(pixmap.copy(0, 0, pixmap.width() - 32, pixmap.height() - 32))
     best_blink_similarity = width * height * 128**3

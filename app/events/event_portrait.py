@@ -13,54 +13,22 @@ from app.engine import engine, image_mods
 
 class EventPortrait():
     width, height = PORTRAIT_WIDTH, PORTRAIT_HEIGHT
+    main_portrait_coords = (0, 0, 96, 80)
+    chibi_coords = (width - 32, 16, 32, 32)
 
-    @property
-    def main_portrait_coords(self):
-        return (0, 0, self.width - 32, self.height - 32)
+    halfblink = (width - 32, 48, 32, 16)
+    fullblink = (width - 32, 64, 32, 16)
     
-    @property
-    def chibi_coords(self):
-        return (self.width - 32, self.height - 96, 32, 32)
-    
-    @property
-    def leftwink(self):
-        return (self.width - 32, self.height - 48, 16, 16)
-    
-    @property
-    def rightwink(self):
-        return (self.width - 16, self.height - 48, 16, 16)
+    leftwink = (width - 32, 64, 16, 16)
+    rightwink = (width - 16, 64, 16, 16)
 
-    @property
-    def halfblink(self):
-        return (self.width - 32, self.height - 64, 32, 16)
-    
-    @property
-    def fullblink(self):
-        return (self.width - 32, self.height - 48, 32, 16)
-        
-    @property
-    def openmouth(self):
-        return (self.width - 128, self.height - 16, 32, 16)
-        
-    @property
-    def halfmouth(self):
-        return (self.width - 96, self.height - 16, 32, 16)
-        
-    @property
-    def closemouth(self):
-        return (self.width - 64, self.height - 16, 32, 16)
-        
-    @property
-    def opensmile(self):
-        return (self.width - 128, self.height - 32, 32, 16)
-        
-    @property
-    def halfsmile(self):
-        return (self.width - 96, self.height - 32, 32, 16)
-        
-    @property
-    def closesmile(self):
-        return (self.width - 64, self.height - 32, 32, 16)
+    openmouth = (0, height - 16, 32, 16)
+    halfmouth = (32, height - 16, 32, 16)
+    closemouth = (64, height - 16, 32, 16)
+
+    opensmile = (0, height - 32, 32, 16)
+    halfsmile = (32, height - 32, 32, 16)
+    closesmile = (64, height - 32, 32, 16)
 
     base_transition_speed = utils.frames2ms(14)
     travel_time = utils.frames2ms(15)
@@ -76,6 +44,18 @@ class EventPortrait():
             self.portrait.image = engine.image_load(self.portrait.full_path)
         self.width = self.portrait.image.get_width()
         self.height = self.portrait.image.get_height()
+        self.main_portrait_coords = (0, 0, self.width - 32, self.height - 32)
+        self.chibi_coords = (self.width - 32, self.height - 96, 32, 32)
+        self.leftwink = (self.width - 32, self.height - 48, 16, 16)
+        self.rightwink = (self.width - 16, self.height - 48, 16, 16)
+        self.halfblink = (self.width - 32, self.height - 64, 32, 16)
+        self.fullblink = (self.width - 32, self.height - 48, 32, 16)
+        self.openmouth = (self.width - 128, self.height - 16, 32, 16)
+        self.halfmouth = (self.width - 96, self.height - 16, 32, 16)
+        self.closemouth = (self.width - 64, self.height - 16, 32, 16)
+        self.opensmile = (self.width - 128, self.height - 32, 32, 16)
+        self.halfsmile = (self.width - 96, self.height - 32, 32, 16)
+        self.closesmile = (self.width - 64, self.height - 32, 32, 16)
         self.portrait.image = self.portrait.image.convert()
         engine.set_colorkey(self.portrait.image, COLORKEY, rleaccel=True)
         self.position = position
