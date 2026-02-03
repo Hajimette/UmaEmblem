@@ -21,18 +21,37 @@ from typing import (Callable, Optional)
 class NewPortraitProperties(QWidget):
     title = "Unit Portrait"
 
-    width, height = 128, 112
-
-    halfblink = (96, 48, 32, 16)
-    fullblink = (96, 64, 32, 16)
-
-    openmouth = (0, 96, 32, 16)
-    halfmouth = (32, 96, 32, 16)
-    closemouth = (64, 96, 32, 16)
-
-    opensmile = (0, 80, 32, 16)
-    halfsmile = (32, 80, 32, 16)
-    closesmile = (64, 80, 32, 16)
+    @property
+    def halfblink(self):
+        return (self.current.pixmap.width() - 32, self.current.pixmap.height() - 64, 32, 16)
+    
+    @property
+    def fullblink(self):
+        return (self.current.pixmap.width() - 32, self.current.pixmap.height() - 48, 32, 16)
+        
+    @property
+    def openmouth(self):
+        return (self.current.pixmap.width() - 128, self.current.pixmap.height() - 16, 32, 16)
+        
+    @property
+    def halfmouth(self):
+        return (self.current.pixmap.width() - 96, self.current.pixmap.height() - 16, 32, 16)
+        
+    @property
+    def closemouth(self):
+        return (self.current.pixmap.width() - 64, self.current.pixmap.height() - 16, 32, 16)
+        
+    @property
+    def opensmile(self):
+        return (self.current.pixmap.width() - 128, self.current.pixmap.height() - 32, 32, 16)
+        
+    @property
+    def halfsmile(self):
+        return (self.current.pixmap.width() - 96, self.current.pixmap.height() - 32, 32, 16)
+        
+    @property
+    def closesmile(self):
+        return (self.current.pixmap.width() - 64, self.current.pixmap.height() - 32, 32, 16)
 
     def __init__(self, parent, current: Optional[T] = None,
                  attempt_change_nid: Optional[Callable[[NID, NID], bool]] = None,
