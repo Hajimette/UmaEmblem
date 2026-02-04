@@ -684,6 +684,8 @@ class Event():
         unit = self._get_unit(nid)
         if unit:
             name = unit.nid
+        elif nid.endswith('_Mirror'):
+            name = nid.replace('_Mirror', '')
         else:
             name = nid
         if unit and unit.portrait_nid:
