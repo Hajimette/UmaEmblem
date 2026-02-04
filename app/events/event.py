@@ -681,19 +681,24 @@ class Event():
             nid = obj.speaker
         else:
             nid = self._resolve_nid(obj)
+        mirror = False
+        if nid.endswith('_Mirror'):
+            mirror = True
+            nid = nid.replace('_Mirror', '')
         unit = self._get_unit(nid)
         if unit:
             name = unit.nid
-        elif nid.endswith('_Mirror'):
-            name = nid.replace('_Mirror', '')
         else:
             name = nid
         if unit and unit.portrait_nid:
-            portrait = RESOURCES.portraits.get(unit.portrait_nid)
+            portrait_string = unit.portrait_nid
         elif name in DB.units:
-            portrait = RESOURCES.portraits.get(DB.units.get(name).portrait_nid)
+            portrait_string = DB.units.get(name).portrait_nid
         else:
-            portrait = RESOURCES.portraits.get(name)
+            portrait_string = name
+        if mirror:
+            portrait_string = portrait_string + '_Mirror'
+        portrait = RESOURCES.portraits.get(portrait_string)
         if not portrait:
             return None, nid
         return portrait, nid
