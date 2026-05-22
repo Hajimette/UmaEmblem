@@ -666,8 +666,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "2",
@@ -684,8 +683,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "3",
@@ -702,8 +700,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "4",
@@ -720,8 +717,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "5",
@@ -738,8 +734,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "6",
@@ -756,8 +751,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "7",
@@ -774,8 +768,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "Village1",
@@ -792,8 +785,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "DestroyVillage1",
@@ -810,8 +802,7 @@
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "Village2",
@@ -828,8 +819,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "DestroyVillage2",
@@ -846,8 +836,7 @@
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "Village3",
@@ -864,8 +853,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "DestroyVillage3",
@@ -882,8 +870,7 @@
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "Village4",
@@ -900,8 +887,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "DestroyVillage4",
@@ -918,8 +904,7 @@
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "Vendor",
@@ -936,8 +921,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             },
             {
                 "nid": "Armory",
@@ -954,8 +938,7 @@
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
-                "interrupt_move": false,
-                "hide_time": false
+                "interrupt_move": false
             }
         ],
         "unit_groups": [
