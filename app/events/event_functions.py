@@ -119,14 +119,6 @@ def add_portrait(self: Event, portrait, screen_position: Tuple | str, slide=None
                  expression_list: Optional[List[str]] = None, speed_mult: float = 1.0, flags=None):
     flags = flags or set()
 
-    portrait_prefab, name = self._get_portrait(portrait)
-    # If already present, don't add
-    if name in self.portraits and not self.portraits[name].remove:
-        return False
-    if not portrait_prefab:
-        self.logger.error("add_portrait: Couldn't find portrait %s" % name)
-        return False
-
     position, mirror = parse_screen_position(screen_position)
 
     priority = self.priority_counter
@@ -136,6 +128,18 @@ def add_portrait(self: Event, portrait, screen_position: Tuple | str, slide=None
 
     if 'mirror' in flags:
         mirror = not mirror
+    if mirror:
+        portrait_prefab, name = self._get_portrait(portrait + '_Mirror')
+        if portrait_prefab:
+            mirror = False
+        else:
+            portrait_prefab, name = self._get_portrait(portrait)
+    # If already present, don't add
+    if name in self.portraits and not self.portraits[name].remove:
+        return False
+    if not portrait_prefab:
+        self.logger.error("add_portrait: Couldn't find portrait %s" % name)
+        return False
 
     transition = True
     if 'immediate' in flags or self.do_skip:
