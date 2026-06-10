@@ -1,6 +1,11 @@
 {
+<<<<<<< Updated upstream
     "date": "2026-05-21 22:56:59.726660",
     "engine_version": "2025.07.15a",
+=======
+    "date": "2026-06-09 17:55:18.249781",
+    "engine_version": "2024.12.09a",
+>>>>>>> Stashed changes
     "serialization_version": 0,
     "project": "Rudolf",
     "has_fatal_errors": true,

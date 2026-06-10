@@ -361,7 +361,7 @@
         "wexp_gain": {},
         "alternate_classes": [],
         "portrait_nid": "Satono Diamond V1",
-        "affinity": null,
+        "affinity": "None",
         "fields": []
     },
     {
@@ -461,7 +461,7 @@
         "wexp_gain": {},
         "alternate_classes": [],
         "portrait_nid": "El",
-        "affinity": null,
+        "affinity": "None",
         "fields": []
     },
     {
@@ -481,6 +481,26 @@
         "wexp_gain": {},
         "alternate_classes": [],
         "portrait_nid": "mcqueen",
+        "affinity": "None",
+        "fields": []
+    },
+    {
+        "nid": "Ayabe",
+        "name": "Admire Vega",
+        "desc": "\"I swore an oath... to that shining star. I will win even if I am alone.\"",
+        "variant": null,
+        "level": 1,
+        "klass": "Archer",
+        "tags": [],
+        "bases": {},
+        "growths": {},
+        "stat_cap_modifiers": {},
+        "starting_items": [],
+        "learned_skills": [],
+        "unit_notes": [],
+        "wexp_gain": {},
+        "alternate_classes": [],
+        "portrait_nid": "Ayabe",
         "affinity": null,
         "fields": []
     },
