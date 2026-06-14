@@ -770,7 +770,6 @@
     {
         "nid": "Ayabe",
         "blinking_offset": [
-<<<<<<< Updated upstream
             24,
             32
         ],
@@ -808,9 +807,6 @@
         "nid": "Mambo",
         "blinking_offset": [
             24,
-=======
-            32,
->>>>>>> Stashed changes
             32
         ],
         "smiling_offset": [
@@ -818,7 +814,6 @@
             48
         ],
         "info_offset": 0
-<<<<<<< Updated upstream
     },
     {
         "nid": "SmartFalconHand",
@@ -831,7 +826,5 @@
             48
         ],
         "info_offset": 0
-=======
->>>>>>> Stashed changes
     }
 ]
