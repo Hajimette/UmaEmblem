@@ -1,8 +1,8 @@
 {
-    "date": "2026-07-10 20:13:02.437063",
+    "date": "2026-07-11 16:24:50.002822",
     "engine_version": "2025.09.14a",
     "serialization_version": 0,
     "project": "Rudolf",
     "has_fatal_errors": true,
-    "as_chunks": false
+    "as_chunks": true
 }
