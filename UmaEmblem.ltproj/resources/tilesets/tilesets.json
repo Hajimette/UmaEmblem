@@ -110,5 +110,10 @@
         "nid": "1",
         "terrain_grid": {},
         "autotiles": {}
+    },
+    {
+        "nid": "03000401",
+        "terrain_grid": {},
+        "autotiles": {}
     }
 ]
