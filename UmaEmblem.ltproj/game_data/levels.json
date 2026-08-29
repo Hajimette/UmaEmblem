@@ -483,6 +483,28 @@
         "ai_groups": []
     },
     {
+        "nid": "3",
+        "name": "Chapter 3",
+        "tilemap": "3",
+        "bg_tilemap": null,
+        "party": "Eirika",
+        "music": {},
+        "objective": {
+            "simple": "",
+            "win": "",
+            "loss": ""
+        },
+        "roam": false,
+        "roam_unit": null,
+        "go_to_overworld": false,
+        "should_record": true,
+        "tags": [],
+        "units": [],
+        "regions": [],
+        "unit_groups": [],
+        "ai_groups": []
+    },
+    {
         "nid": "5",
         "name": "Debug",
         "tilemap": "Chapter 5",
