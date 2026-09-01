@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QTextEdit, QStackedWidget
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QFontMetrics, QIcon
 
 from app.data.resources.resources import RESOURCES
@@ -9,7 +9,7 @@ from app.extensions.custom_gui import PropertyBox, ComboBox
 from app.extensions.list_widgets import AppendMultiListWidget
 from app.extensions.key_value_delegate import KeyValueDelegate, KeyValueDoubleListModel
 
-from app.editor.icons import PushableIcon16, MapSpriteBox
+from app.editor.icons import PushableIcon16, MapSpriteBox, UnitPortrait
 from app.editor.icon_editor import icon_tab
 from app.editor.lib.components.validated_line_edit import NidLineEdit
 
@@ -95,12 +95,6 @@ class NewCreditProperties(QWidget):
         credit_type = self.type_box.edit.currentData()
         self.current.credit_type = credit_type
 
-        if self.current.credit_type in ["List", "Text"]:
-            self.category_box.setEnabled(True)
-        else:
-            self.category_box.setEnabled(False)
-            self.category_box.edit.setText('Graphics')
-
         idx = self.CREDIT_TYPES.index(credit_type)
         self.desc_box.setCurrentIndex(idx)
         self.desc_box.currentWidget().set_current(self.current)
@@ -164,8 +158,9 @@ class PanoramaDesc(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.window = parent
-
-        self.layout = QVBoxLayout()
+        
+        self.header_box = PropertyBox("Header", QLineEdit, self)
+        self.header_box.edit.textChanged.connect(self.header_changed)
 
         self.panorama_box = PropertyBox("Contribution", ComboBox, self)
         self.panorama_box.edit.addItem(QIcon(), 'None')
@@ -181,10 +176,15 @@ class PanoramaDesc(QWidget):
         self.author_box = PropertyBox("Author", QLineEdit, self)
         self.author_box.edit.textChanged.connect(self.author_changed)
 
-        self.layout.addWidget(self.panorama_box)
-        self.layout.addWidget(self.contrib_box)
-        self.layout.addWidget(self.author_box)
-        self.layout.setAlignment(Qt.AlignCenter)
+        centered_layout = QVBoxLayout()
+        centered_layout.addWidget(self.panorama_box)
+        centered_layout.addWidget(self.contrib_box)
+        centered_layout.addWidget(self.author_box)
+        centered_layout.setAlignment(Qt.AlignCenter)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.header_box)
+        self.layout.addLayout(centered_layout)
         self.setLayout(self.layout)
 
     def panorama_changed(self, index):
@@ -212,8 +212,13 @@ class PanoramaDesc(QWidget):
         if contrib and len(contrib[0]) > 1:
             desc = contrib[0][1]
         self.window.current.contrib = [(text, desc)]
+        
+    def header_changed(self, text=None):
+        self.window.current.custom_header = text
 
     def set_current(self, current):
+        self.header_box.edit.setText(current.custom_header or current.header())
+        
         try:
             self.panorama_box.edit.setValue(current.sub_nid)
         except: # spec isn't compatible
@@ -248,15 +253,11 @@ class CreditPushableIcon(PushableIcon16):
             self.database = RESOURCES.portraits
 
     def onIconSourcePicker(self):
-        if self.credit_type == ResourceType.PORTRAITS:
-            from app.editor.portrait_editor import new_portrait_tab
-            res, ok = new_portrait_tab.get()
-        else:           
-            from app.editor.icon_editor import icon_tab
-            if self.credit_type == ResourceType.MAP_ICONS:
-                res, ok = icon_tab.get_map_icon_editor()
-            else:
-                res, ok = icon_tab.get(self.width, self._nid)
+        from app.editor.icon_editor import icon_tab
+        if self.credit_type == ResourceType.MAP_ICONS:
+            res, ok = icon_tab.get_map_icon_editor()
+        else:
+            res, ok = icon_tab.get(self.width, self._nid)
 
         if res and ok:
             icon_index = (0, 0)
@@ -266,15 +267,27 @@ class CreditPushableIcon(PushableIcon16):
             self.change_icon(res.nid, icon_index)
             self.sourceChanged.emit(self._nid, self.x, self.y)
 
+class PortraitIcon(UnitPortrait):
+    sourceChanged = pyqtSignal(str, int, int)
+
+    def change_icon(self, nid, index=None):
+        self._nid = nid
+        self.sourceChanged.emit(self._nid, 0, 0)
+        self.render()
+
 class IconDesc(QWidget):
-    def __init__(self, parent=None, credit_type='16x16_Icons'):
+    def __init__(self, parent=None, credit_type=ResourceType.ICONS16):
         super().__init__(parent)
         self.window = parent
+        
+        self.header_box = PropertyBox("Header", QLineEdit, self)
+        self.header_box.edit.textChanged.connect(self.header_changed)
 
-        self.layout = QVBoxLayout()       
-
-        self.icon_box = PropertyBox("Contribution", CreditPushableIcon, self)
-        self.icon_box.edit.setType(credit_type)
+        if credit_type == ResourceType.PORTRAITS:
+            self.icon_box = PropertyBox("Contribution", PortraitIcon, self)
+        else:
+            self.icon_box = PropertyBox("Contribution", CreditPushableIcon, self)
+            self.icon_box.edit.setType(credit_type)
         self.icon_box.edit.sourceChanged.connect(self.on_icon_changed)
 
         self.contrib_box = PropertyBox("Name", QLineEdit, self)
@@ -282,11 +295,16 @@ class IconDesc(QWidget):
 
         self.author_box = PropertyBox("Author", QLineEdit, self)
         self.author_box.edit.textChanged.connect(self.author_changed)
-
-        self.layout.addWidget(self.icon_box)
-        self.layout.addWidget(self.contrib_box)
-        self.layout.addWidget(self.author_box)
-        self.layout.setAlignment(Qt.AlignCenter)
+        
+        centered_layout = QVBoxLayout()
+        centered_layout.addWidget(self.icon_box)
+        centered_layout.addWidget(self.contrib_box)
+        centered_layout.addWidget(self.author_box)
+        centered_layout.setAlignment(Qt.AlignCenter)
+        
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.header_box)
+        self.layout.addLayout(centered_layout)
         self.setLayout(self.layout)
 
     def on_icon_changed(self, nid, x, y):
@@ -315,8 +333,13 @@ class IconDesc(QWidget):
         if contrib and len(contrib[0]) > 1:
             desc = contrib[0][1]
         self.window.current.contrib = [(text, desc)]
+        
+    def header_changed(self, text=None):
+        self.window.current.custom_header = text
 
     def set_current(self, current):
+        self.header_box.edit.setText(current.custom_header or current.header())
+        
         try:
             self.icon_box.edit.change_icon(current.sub_nid, current.icon_index)
         except:
@@ -333,6 +356,9 @@ class MapSpriteDesc(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.window = parent
+        
+        self.header_box = PropertyBox("Header", QLineEdit, self)
+        self.header_box.edit.textChanged.connect(self.header_changed)
 
         self.map_sprite_box = MapSpriteBox(self, self.window.current, display_width=160, orient=Orientation.VERTICAL)
         self.map_sprite_box.sourceChanged.connect(self.select_map_sprite)
@@ -340,10 +366,14 @@ class MapSpriteDesc(QWidget):
         self.author_box = PropertyBox("Author", QLineEdit, self)
         self.author_box.edit.textChanged.connect(self.author_changed)
 
+        centered_layout = QVBoxLayout()
+        centered_layout.addWidget(self.map_sprite_box)
+        centered_layout.addWidget(self.author_box)
+        centered_layout.setAlignment(Qt.AlignCenter)
+
         self.layout = QVBoxLayout()
-        self.layout.addWidget(self.map_sprite_box)
-        self.layout.addWidget(self.author_box)
-        self.layout.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.header_box)
+        self.layout.addLayout(centered_layout)
         self.setLayout(self.layout)
 
     def select_map_sprite(self, nid):
@@ -352,8 +382,13 @@ class MapSpriteDesc(QWidget):
     def author_changed(self, text):
         if text:
             self.window.current.contrib = [(text, None)]
+            
+    def header_changed(self, text=None):
+        self.window.current.custom_header = text
 
     def set_current(self, current):
+        self.header_box.edit.setText(current.custom_header or current.header())
+        
         self.map_sprite_box.set_current(current, current.sub_nid)
 
         if current.contrib:
@@ -391,8 +426,8 @@ class ListDesc(QWidget):
         self.setLayout(self.layout)
 
     def header_changed(self, text=None):
-        self.window.current.sub_nid = text
+        self.window.current.custom_header = text
 
     def set_current(self, current):
-        self.header_box.edit.setText(current.sub_nid)
+        self.header_box.edit.setText(current.custom_header or current.header())
         self.desc_box.set_current(current.contrib)

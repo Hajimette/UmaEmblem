@@ -114,6 +114,9 @@ class MapSprite():
                 colors: List[Color3] = palette.get_colors()
             else:
                 colors: List[Color3] = default_palettes['map_sprite_black']
+        elif not game.teams:
+            # Currently in Title Screen, havent loaded any games, so game.teams is empty
+            return map_sprite.standing_image, map_sprite.moving_image
         else:
             palette = self._get_team_palette()
             if palette:
@@ -138,6 +141,9 @@ class MapSprite():
         # Handle the situation where team is "black"
         if self.team == 'black':
             new_colors: List[Color3] = default_palettes['map_sprite_black']
+        elif not game.teams:
+            # Currently in Title Screen, havent loaded any games, so game.teams is empty
+            new_colors: List[Color3] = default_palettes['map_sprite_blue']
         else:
             current_palette = self._get_team_palette()
             new_colors: List[Color3] = current_palette.get_colors()
@@ -163,7 +169,7 @@ def load_map_sprite(unit: UnitObject | UnitPrefab, team='player'):
     if not res:
         return None
     
-    palette_override = skill_system.change_map_palette(unit)
+    palette_override = skill_system.change_map_palette(unit) if isinstance(unit, UnitObject) else None
     if palette_override:
         term = palette_override
     else:
@@ -446,6 +452,9 @@ class UnitSprite():
                 self.set_image_state('up')
             else:
                 self.set_image_state('down')
+
+    def clear_net_position(self):
+        self.net_position = None
 
     def update(self):
         self.update_state()
@@ -754,7 +763,7 @@ class UnitSprite():
             topleft = (left - 8, top - 8)
             surf.blit(rescue_icon, topleft)
 
-        if any((i.droppable for i in self.unit.items)):
+        if DB.constants.value('droppable_icon') and any((i.droppable for i in self.unit.items)):
             droppable_icon = SPRITES.get('droppable_icon')
             topleft = (left - 8, top - 8)
             surf.blit(droppable_icon, topleft)

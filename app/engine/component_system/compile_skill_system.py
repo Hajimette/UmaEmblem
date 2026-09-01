@@ -30,6 +30,7 @@ SKILL_HOOKS: Dict[str, HookInfo] = {
     'hide_skill_icon':                      HookInfo(['unit'], ResolvePolicy.ALL_DEFAULT_FALSE),
     'ignore_dying_in_combat':               HookInfo(['unit'], ResolvePolicy.ALL_DEFAULT_FALSE),
     'no_trade':                             HookInfo(['unit'], ResolvePolicy.ALL_DEFAULT_FALSE),
+    'no_convoy':                            HookInfo(['unit'], ResolvePolicy.ALL_DEFAULT_FALSE),
     # false priority, true if any (set to True if result is True in any component, False if not defined)
     'can_unlock':                           HookInfo(['unit', 'region'], ResolvePolicy.ANY_DEFAULT_FALSE),
     'has_canto':                            HookInfo(['unit', 'target'], ResolvePolicy.ANY_DEFAULT_FALSE),
@@ -88,6 +89,8 @@ SKILL_HOOKS: Dict[str, HookInfo] = {
     'empower_splash':                       HookInfo(['unit'], ResolvePolicy.NUMERIC_ACCUM),
     'empower_heal':                         HookInfo(['unit', 'target'], ResolvePolicy.NUMERIC_ACCUM),
     'empower_heal_received':                HookInfo(['unit', 'target'], ResolvePolicy.NUMERIC_ACCUM),
+    'empower_mana':                         HookInfo(['unit', 'target'], ResolvePolicy.NUMERIC_ACCUM),
+    'empower_mana_received':                HookInfo(['unit', 'target'], ResolvePolicy.NUMERIC_ACCUM),
     'modify_damage':                        HookInfo(['unit', 'item'], ResolvePolicy.NUMERIC_ACCUM),
     'modify_resist':                        HookInfo(['unit', 'item'], ResolvePolicy.NUMERIC_ACCUM),
     'modify_accuracy':                      HookInfo(['unit', 'item'], ResolvePolicy.NUMERIC_ACCUM),

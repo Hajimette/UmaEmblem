@@ -77,9 +77,7 @@ class SupportAbility(Ability):
             units = set()
             for u in adj_units:
                 for prefab in DB.support_pairs.get_pairs(unit.nid, u.nid):
-                    if prefab.nid not in game.supports.support_pairs:
-                        game.supports.create_pair(prefab.nid)
-                    pair = game.supports.support_pairs[prefab.nid]
+                    pair = game.supports.create_pair(prefab.nid)
                     if pair.can_support():
                         units.add(u)
                         break
@@ -295,7 +293,7 @@ class SupplyAbility(Ability):
 
     @staticmethod
     def targets(unit) -> set:
-        if game.game_vars.get('_convoy'):
+        if game.game_vars.get('_convoy') and not skill_system.no_convoy(unit):
             adj_allies = game.target_system.get_adj_allies(unit)
             if 'Convoy' in unit.tags:
                 return {unit.position}

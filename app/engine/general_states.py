@@ -44,9 +44,16 @@ class LoadingState(State):
         # magic number, adjust at will
         self.loading_threads: List[threading.Thread] = []
 
+        # stop current music before loading new assets to prevent
+        # audio stutter caused by pygame.mixer.Sound() acquiring the
+        # SDL audio lock in the background thread while music is playing
+        # it didn't make sense that we originally tried to persist
+        # bgm while we transitioned, which led to annoying stutters
+        # it had no front-facing advantage for the player, afaik
+        get_sound_thread().clear()
         # unload used assets
         # unload music
-        get_sound_thread().flush(False)
+        get_sound_thread().flush()
         get_sound_thread().set_music_volume(cf.SETTINGS['music_volume'])
         get_sound_thread().set_sfx_volume(cf.SETTINGS['sound_volume'])
 
@@ -586,6 +593,10 @@ class OptionMenuState(MapState):
                         game.events.trigger_specific_event(event_prefab.nid)
 
         elif event == 'INFO':
+            if self.menu.info_flag:
+                get_sound_thread().play_sfx('Info Out')
+            else:
+                get_sound_thread().play_sfx('Info In')
             self.menu.toggle_info()
 
     def update(self):
@@ -734,6 +745,7 @@ class MoveState(MapState):
 
         elif event == 'SELECT':
             if game.cursor.position == cur_unit.position:
+                cur_unit.sprite.clear_net_position()
                 if cur_unit.has_attacked or cur_unit.has_traded:
                     # Just move in place
                     cur_unit.current_move = action.CantoMove(cur_unit, game.cursor.position)
@@ -756,6 +768,7 @@ class MoveState(MapState):
                         if game.cursor.position in witch_warp and game.cursor.position not in normal_moves:
                             cur_unit.current_move = action.Warp(cur_unit, game.cursor.position)
                         else:
+                            game.cursor.clamp_path_to_movement()
                             cur_unit.current_move = action.CantoMove(cur_unit, game.cursor.position)
                         game.state.change('canto_wait')
                     elif game.cursor.position in witch_warp and game.cursor.position not in normal_moves:
@@ -763,6 +776,7 @@ class MoveState(MapState):
                         cur_unit.current_move = action.Warp(cur_unit, game.cursor.position)
                         game.state.change('menu')
                     else:
+                        game.cursor.clamp_path_to_movement()
                         action.do(action.MarkActionGroupStart(cur_unit, 'free'))
                         cur_unit.current_move = action.Move(cur_unit, game.cursor.position)
                         game.state.change('menu')
@@ -838,7 +852,7 @@ class CantoWaitState(MapState):
         self.menu.set_color(['green' if option == 'Supply' else None for option in options])
 
     def begin(self):
-        self.cur_unit.sprite.change_state('selected')
+        self.cur_unit.sprite.change_state('chosen')
 
     def take_input(self, event):
         first_push = self.fluid.update()
@@ -1019,7 +1033,7 @@ class MenuState(MapState):
             else:
                 for ability_name, ability in self.combat_arts['_uncategorized'].items():
                     options.insert(start_index, ability_name)
-                    info_descs.insert(start_index, ability[0].desc)
+                    info_descs.insert(start_index, text_funcs.translate_and_text_evaluate(ability[0].desc, self=self.cur_unit, unit=self.cur_unit))
                 for category_name in self.combat_arts:
                     if category_name != '_uncategorized':
                         options.insert(start_index, category_name)
@@ -1218,7 +1232,8 @@ class MenuState(MapState):
             # since combat arts category is checked, self.combat_arts is uncategorized
             combat_arts: List[Tuple[SkillObject, List[ItemObject]]] = list(self.combat_arts.values())
             options = [combat_art[0] for combat_art in combat_arts]
-            info_desc = [option.desc for option in options]
+            info_desc = [text_funcs.translate_and_text_evaluate(option.desc, self=self.cur_unit, unit=self.cur_unit) 
+                         for option in options]
             game.memory['ability_submenu_choice'] = (combat_arts,
                                                      options, info_desc,
                                                      on_combat_art_begin,
@@ -1233,7 +1248,8 @@ class MenuState(MapState):
             combat_art_dict = self.combat_arts[selection]  # get combat arts in category
             combat_arts: List[Tuple[SkillObject, List[ItemObject]]] = list(combat_art_dict.values())
             options = [combat_art[0] for combat_art in combat_arts]
-            info_desc = [option.desc for option in options]
+            info_desc = [text_funcs.translate_and_text_evaluate(option.desc, self=self.cur_unit, unit=self.cur_unit) 
+                         for option in options]
             game.memory['ability_submenu_choice'] = (combat_arts,
                                                      options, info_desc,
                                                      on_combat_art_begin,
@@ -2474,10 +2490,10 @@ class CombatTargetingState(MapState):
             if item_system.targets_items(self.cur_unit, self.item):
                 ignore = [not item_system.item_restrict(self.cur_unit, self.item, target_unit, item) for item in target_unit.items]
                 game.ui_view.draw_trade_preview(target_unit, surf, ignore)
-            elif item_system.is_weapon(self.cur_unit, self.item):
+            elif item_system.is_weapon(self.cur_unit, self.item) and not cf.SETTINGS['forecast'] == 'Off':
                 self.find_strike_partners(game.cursor.position, atk=False)
                 game.ui_view.draw_attack_info(surf, self.cur_unit, self.item, target_unit, self.attacker_assist, self.defender_assist)
-            else:
+            elif not cf.SETTINGS['forecast'] == 'Off':
                 game.ui_view.draw_spell_info(surf, self.cur_unit, self.item, target_unit)
 
         return surf

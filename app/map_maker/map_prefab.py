@@ -2,11 +2,12 @@ from typing import Dict, List, Set, Tuple
 
 from app.utilities.typing import NID, Pos
 
+from app.utilities import utils
 from app.utilities.data import Prefab
 import app.map_maker.utilities as map_utils
 from app.map_maker.terrain import Terrain
 from app.map_maker.palette_collection import PaletteCollection
-from app.map_maker.qt_renderers.renderer_database import RENDERERS
+from app.map_maker.painter_database import PAINTERS
 
 TILEX, TILEY = 15, 10
 
@@ -28,24 +29,29 @@ class MapPrefab(Prefab):
         self.current_indoor_palette: PaletteCollection = None
         self.current_outdoor_palette: PaletteCollection = None
 
+        # Per-map RNG seed. Kept in sync with the module-level RANDOM_SEED in
+        # map_maker.utilities (which other painters still read); the mountain
+        # painter/solver read it off the prefab as self.tilemap.seed.
+        self.seed: int = 0
+
     def reset_all(self):
         for position in self.terrain_grid:
             self.terrain_grid_to_update.add(position)
 
     def set(self, pos: Pos, old_terrain: Terrain, new_terrain: Terrain):
-        old_terrain_renderer = RENDERERS.get(old_terrain)
-        new_terrain_renderer = RENDERERS.get(new_terrain)
-        if old_terrain and old_terrain_renderer.painter.check_flood_fill:
+        old_terrain_painter = PAINTERS.get(old_terrain)
+        new_terrain_painter = PAINTERS.get(new_terrain)
+        if old_terrain and old_terrain_painter.check_flood_fill:
             # Need to check flood fill both before and after changing terrain
-            self._update_flood_fill(pos, old_terrain_renderer.painter.check_flood_fill == 'diagonal')  
+            self._update_flood_fill(pos, old_terrain_painter.check_flood_fill == 'diagonal')
         self.terrain_grid[pos] = new_terrain
         self.terrain_grid_to_update.add(pos)
         self._update_adjacent(pos)
         self._update_diagonal(pos)
-        if new_terrain_renderer.painter.check_flood_fill:
-            self._update_flood_fill(pos, new_terrain_renderer.painter.check_flood_fill == 'diagonal')
+        if new_terrain_painter.check_flood_fill:
+            self._update_flood_fill(pos, new_terrain_painter.check_flood_fill == 'diagonal')
 
-        if new_terrain_renderer.painter.has_autotiles():
+        if new_terrain_painter.has_autotiles():
             self.autotile_set.add(pos)
         else:
             self.autotile_set.discard(pos)
@@ -55,8 +61,8 @@ class MapPrefab(Prefab):
         self.terrain_grid = terrain_grid
         self.autotile_set.clear()
         for pos, terrain in self.terrain_grid.items():
-            terrain_renderer = RENDERERS.get(terrain)
-            if terrain_renderer.painter.has_autotiles():
+            terrain_painter = PAINTERS.get(terrain)
+            if terrain_painter.has_autotiles():
                 self.autotile_set.add(pos)
         self.reset_all()
 
@@ -93,9 +99,9 @@ class MapPrefab(Prefab):
         return self.terrain_grid.get(pos)
 
     def erase_terrain(self, pos: Pos, old_terrain: Terrain):
-        old_terrain_renderer = RENDERERS.get(old_terrain)
-        if old_terrain and old_terrain_renderer.painter.check_flood_fill:
-            self._update_flood_fill(pos, old_terrain_renderer.painter.check_flood_fill == 'diagonal')
+        old_terrain_painter = PAINTERS.get(old_terrain)
+        if old_terrain and old_terrain_painter.check_flood_fill:
+            self._update_flood_fill(pos, old_terrain_painter.check_flood_fill == 'diagonal')
         if pos in self.terrain_grid:
             del self.terrain_grid[pos]
         self.autotile_set.discard(pos)
@@ -155,11 +161,31 @@ class MapPrefab(Prefab):
                 new_tile_grid[new_pos] = tile_coord
         self.tile_grid = new_tile_grid
 
-        for pos in list(self.autotile_set):
-            if self.check_bounds(pos):
-                pass
-            else:
-                self.autotile_set.remove(pos)
+        # The autotile positions must be shifted along with the terrain they
+        # belong to. Leaving them at their old positions means draw_tilemap's
+        # autotile pass calls determine_sprite() on whatever terrain happens to
+        # have moved onto that position -- bypassing the terrain_grid_to_update
+        # gate -- and painters that build their coords in single_process()
+        # (mountain, cliff, ...) have no entry for it yet.
+        new_autotile_set = set()
+        for pos in self.autotile_set:
+            new_pos = pos[0] + x_offset, pos[1] + y_offset
+            if self.check_bounds(new_pos):
+                new_autotile_set.add(new_pos)
+        self.autotile_set = new_autotile_set
+
+        # Cliff markers are map positions as well
+        self.cliff_markers = [(int(utils.clamp(pos[0] + x_offset, 0, width - 1)),
+                               int(utils.clamp(pos[1] + y_offset, 0, height - 1)))
+                              for pos in self.cliff_markers]
+
+        # Every painter's cached organization is keyed off position, so all of
+        # it is stale now -- kill any in-flight solve (it would report sprites
+        # at pre-resize positions) and force a full recompute on the next draw
+        for painter in PAINTERS.values():
+            painter.quit_all_threads()
+        self.terrain_grid_to_update.clear()
+        self.reset_all()
 
     def save(self):
         s_dict = {}
@@ -193,7 +219,8 @@ class MapPrefab(Prefab):
         for str_coord in s_dict['autotile_set']:
             coord = tuple(int(_) for _ in str_coord.split(','))
             self.autotile_set.add(coord)
-        map_utils.set_random_seed(s_dict.get('seed', 0))
+        self.seed = s_dict.get('seed', 0)
+        map_utils.set_random_seed(self.seed)
         self.current_indoor_palette = s_dict.get('indoor_palette')
         self.current_outdoor_palette = s_dict.get('outdoor_palette')
         return self

@@ -9,7 +9,7 @@ The Windows executable version of the **Lex Talionis** editor can be downloaded 
 
 ![PictureOfDoubleClick](images/PictureOfDoubleClick.png)
 
-This executable will **ONLY** work on Windows. On Mac and Linux you must follow the Python Installation method linked above. Once you have downloaded and unzipped the file, locate the `double_click_to_run.bat`. Double-click it to run the editor.
+This executable will **ONLY** work on Windows. On Mac, you must follow the Python Installation method linked above. On Linux, refer to the [Linux installation guide](LinuxInstall). Once you have downloaded and unzipped the file, locate the `double_click_to_run.bat`. Double-click it to run the editor.
 
 **warning: IF YOU DOWNLOAD THE WINDOWS EXECUTABLE VERSION YOU DO NOT NEED TO PROCEED WITH ANY OTHER INSTALLATION STEPS.**
 
@@ -56,6 +56,8 @@ If you double-click a specific level, it will start the Level Editor mode of the
 If you've made changes to the default project, you can save your changes easily as a new personal project of your own. Just click **File->Save as...** and give your project a name. The engine will append the *.ltproj* suffix onto the end of your project folder during the save process. You can then open this project at any time to resume your work.
 
 > Don't save your project as `default` or `autosave`. These projects are already used in the editor.
+
+> Don't save your project in a folder with cloud saving features (such as OneDrive or iCloud). This can cause serialization errors and corrupt project data which will prevent you from saving and opening your project in the future.
 
 ## Updating the Engine (Executable)
 

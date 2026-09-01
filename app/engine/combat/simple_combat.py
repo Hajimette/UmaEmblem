@@ -19,6 +19,11 @@ class SimpleCombat():
     event_combat: bool = False
     arena_combat: bool = False
     alerts: bool = False  # Whether to show end of combat alerts
+    # Whether ending this combat finalizes the attacker's tactical turn (the
+    # clear->free->wait in handle_state_stack). True for on-map combat; False
+    # for a base/prep "Use" (BaseCombat), which consumes no turn. Read when a
+    # cancellable promotion defers its turn finalization to PromotionState.
+    finalizes_turn: bool = True
     """
     Does the simple mechanical effects of combat without any effects
     """
@@ -244,12 +249,15 @@ class SimpleCombat():
 
     def cleanup_combat(self):
         skill_system.cleanup_combat(self.full_playback, self.attacker, self.main_item, self.defender, resolve_weapon(self.defender), 'attack')
+        item_system.cleanup_combat(self.full_playback, self.attacker, self.main_item, self.defender, resolve_weapon(self.defender), 'attack')
         already_pre = [self.attacker]
         for idx, defender in enumerate(self.defenders):
             if defender and defender not in already_pre:
                 already_pre.append(defender)
                 def_item = self.def_items[idx]
                 skill_system.cleanup_combat(self.full_playback, defender, def_item, self.attacker, self.main_item, 'defense')
+                if def_item:
+                    item_system.cleanup_combat(self.full_playback, defender, def_item, self.attacker, self.main_item, 'defense')
         for unit in self.all_splash:
             skill_system.cleanup_combat(self.full_playback, unit, None, self.attacker, self.main_item, 'defense')
 

@@ -52,6 +52,8 @@ This will clone the repository to your machine, where you'll have access to it.
 
 ## Installing Python
 
+<span style="color: red; font-weight: bold;">Use python version 3.11 only, instead of latest version.</span>
+
 https://www.python.org/downloads/release/python-3117/
 
 Navigate down to "Files" on that webpage and click "Windows installer (64-bit)" (assuming you have a 64-bit Windows machine).
@@ -145,7 +147,7 @@ python run_engine.py
 ```
 from within the "lt-maker" directory.
 
-The engine main screen should pop up and you should be able to play the Lion Throne.
+The engine main screen should pop up and you should be able to play the first five chapters of Sacred Stones.
 
 ![TitleScreen](images/TitleScreen.png)
 
@@ -158,8 +160,6 @@ from within the "lt-maker" directory.
 The editor should pop up and you should be able to begin making your own fangame.
 
 ![EditorScreen](images/EditorScreen.png)
-
-> Some users have reported that on Linux systems (specifically Ubuntu), PyQt5 installation does not work. In that case, try: `sudo apt-get install python3-pyqt5` instead.
 
 Once installed, you can follow the second part of the [Build Engine](Build-Engine) guide to distribute your project as an executable.
 

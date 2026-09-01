@@ -5,7 +5,6 @@ import logging
 import os
 from pathlib import Path
 import re
-import shutil
 from typing import Any, Dict, List
 
 from app.data.category import Categories, CategorizedCatalog
@@ -17,7 +16,7 @@ from app.data.database import (ai, constants, difficulty_modes, equations,
 from app.data.serialization import disk_loader
 from app.events import event_prefab
 from app.utilities.data_order import parse_order_keys_file
-from app.utilities.serialization import load_json, save_json
+from app.utilities.serialization import load_json, save_json, rmtree_robust
 from app.utilities.typing import NID
 
 CATEGORY_SUFFIX = '.category'
@@ -29,6 +28,10 @@ class Database(object):
                        "support_pairs", "ai", "parties", "difficulty_modes", "credit",
                        "translations", "lore", "levels", "events", "overworlds", "raw_data")
     save_as_chunks = ("events", 'items', 'skills', 'units', 'classes', 'levels', "credit")
+    # Data types that were added to the format after the fact. Projects created before
+    # then simply don't have the file on disk, so rather than refusing to load them,
+    # we fall back to an empty catalog and write it out on the next save.
+    optional_data_types = ("credit",)
 
     def __init__(self):
         self.current_proj_dir = None
@@ -45,7 +48,7 @@ class Database(object):
         self.factions = factions.FactionCatalog()
         self.items = items.ItemCatalog()
         self.skills = skills.SkillCatalog()
-        self.tags = tags.TagCatalog(['Lord', 'Boss', 'Armor', 'Horse', 'Mounted', 'Dragon', 'ZeroMove', 'AutoPromote', 'NoAutoPromote'])
+        self.tags = tags.TagCatalog()
         self.game_var_slots = varslot.VarSlotCatalog([])
         self.classes = klass.ClassCatalog()
 
@@ -130,7 +133,7 @@ class Database(object):
                 if key in self.save_as_chunks and as_chunks:
                     save_dir = os.path.join(data_dir, key)
                     if os.path.exists(save_dir):
-                        shutil.rmtree(save_dir)
+                        rmtree_robust(save_dir)
                     os.mkdir(save_dir)
                     orderkeys: List[str] = []
                     for idx, subvalue in enumerate(value):
@@ -147,13 +150,21 @@ class Database(object):
                     # Which means deleting the old directory
                     save_dir = Path(data_dir, key)
                     if os.path.exists(save_dir):
-                        shutil.rmtree(save_dir)
+                        rmtree_robust(save_dir)
                     save_loc = Path(data_dir, key + '.json')
                     # logging.info("Serializing %s to %s" % (key, save_loc))
                     save_json(save_loc, value)
 
-        except OSError as e:  # In case we ran out of memory
-            logging.error("Editor was unable to save your project. Free up memory in your hard drive or try saving somewhere else, otherwise progress will be lost when the editor is closed.")
+        except PermissionError as e:  # Access denied (read-only file, AV lock, or cloud-sync handle)
+            logging.error("Editor was denied permission to save your project (%s). "
+                          "The project folder or a file inside it may be read-only, locked by "
+                          "antivirus, or held open by cloud sync (OneDrive/Dropbox). Try moving "
+                          "the project out of a synced folder, clearing read-only, or saving "
+                          "somewhere else, otherwise progress will be lost when the editor is closed.", e)
+            logging.exception(e)
+            return False
+        except OSError as e:  # e.g. disk full
+            logging.error("Editor was unable to save your project. Free up space on your hard drive or try saving somewhere else, otherwise progress will be lost when the editor is closed.")
             logging.exception(e)
             return False
 

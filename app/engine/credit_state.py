@@ -2,6 +2,7 @@ from app.constants import WINHEIGHT, WINWIDTH, COLORKEY
 
 from app.data.database.database import DB
 from app.data.database.credit import CreditEntry, CreditCatalog
+from app.data.resources.portraits import INFO_PORTRAIT_WIDTH, INFO_PORTRAIT_HEIGHT
 from app.data.resources.resources import RESOURCES
 from app.data.resources.resource_types import ResourceType
 
@@ -67,7 +68,8 @@ def populate_options(credit_catalog: CreditCatalog) -> Tuple[List[str], List[str
         ignore.append(False)
         prev_option = curr_option
         temp_list = [credit]
-    ordered_credits.append(temp_list)
+    if temp_list:  # No credits at all
+        ordered_credits.append(temp_list)
 
     return options, ignore, ordered_credits
 
@@ -161,6 +163,8 @@ class CreditDisplay():
         self.credits = credits
         self.current = None
         self.pages = []
+        self.num_pages = 0
+        self.page_num = 0
         self.font = 'text'
 
         self.topleft = (84, 4)
@@ -191,10 +195,11 @@ class CreditDisplay():
         self.current = idx
         self.page_num = 0
         self.pages = []
+        self.num_pages = 0
 
         self.contents = []
 
-        lst = self.credits[idx]
+        lst = self.credits[idx] if idx < len(self.credits) else None
         if lst:
             if lst[0].credit_type in (ResourceType.ICONS16, ResourceType.ICONS32, 
                                       ResourceType.MAP_ICONS, ResourceType.MAP_SPRITES):
@@ -263,6 +268,8 @@ class CreditDisplay():
         self.clear_display()
 
     def page_right(self, first_push=False) -> bool:
+        if not self.num_pages:
+            return False
         if self.page_num < self.num_pages - 1:
             self.page_num += 1
             self.right_arrow.pulse()
@@ -276,6 +283,8 @@ class CreditDisplay():
         return False
 
     def page_left(self, first_push=False) -> bool:
+        if not self.num_pages:
+            return False
         if self.page_num > 0:
             self.page_num -= 1
             self.left_arrow.pulse()
@@ -315,9 +324,18 @@ class CreditDisplay():
             self.portrait = InfoMenuPortrait(portrait, DB.constants.value('info_menu_blink')) if portrait else None
 
         if self.portrait:
+            width, height = (self.width - 8, WINHEIGHT - 12)
             self.portrait.update()
             im = self.portrait.create_image()
-            surf.blit(im, utils.tuple_add((self.width - 8 - 96, WINHEIGHT - 12 - 80), self.topleft))
+            prefab = self.portrait.portrait
+            x_offset = utils.clamp(prefab.get_info_coord()[0] + (INFO_PORTRAIT_WIDTH - width) // 2,
+                                    0, prefab.face_size[0] - width)
+            y_offset = utils.clamp(prefab.get_info_coord()[1] + (INFO_PORTRAIT_HEIGHT - height) // 2,
+                                    0, prefab.face_size[1] - height)
+            im = engine.subsurface(im, (x_offset, y_offset, width, height)).convert_alpha()
+            im = image_mods.make_translucent(im, 0.5)
+            # Blit from bottom right
+            surf.blit(im, utils.tuple_sub(utils.tuple_add(self.topleft, (width, height)), im.get_size()))
 
         elif credit.credit_type == ResourceType.MAP_SPRITES:
             y_pos = 20

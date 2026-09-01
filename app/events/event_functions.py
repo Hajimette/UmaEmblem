@@ -16,6 +16,7 @@ from app.engine import (action, background, banner, base_surf, dialog, engine,
                         gui, icons, image_mods, item_funcs, item_system,
                         save, skill_system, unit_funcs)
 from app.engine.game_board import FogOfWarType
+from app.engine.fog_of_war import FogOfWarColor
 from app.engine.achievements import ACHIEVEMENTS
 from app.engine.animations import MapAnimation
 from app.engine.combat import interaction
@@ -119,7 +120,7 @@ def add_portrait(self: Event, portrait, screen_position: Tuple | str, slide=None
                  expression_list: Optional[List[str]] = None, speed_mult: float = 1.0, flags=None):
     flags = flags or set()
 
-    position, mirror = parse_screen_position(screen_position)
+    position, mirror = parse_screen_position(screen_position, portrait_size=portrait_prefab.face_size)
 
     priority = self.priority_counter
     if 'low_priority' in flags:
@@ -231,7 +232,7 @@ def move_portrait(self: Event, portrait, screen_position: Tuple, speed_mult: flo
     if not event_portrait:
         return False
 
-    position, _ = parse_screen_position(screen_position)
+    position, _ = parse_screen_position(screen_position, portrait_size=event_portrait.get_size())
 
     if 'immediate' in flags or self.do_skip:
         event_portrait.quick_move(position)
@@ -338,10 +339,11 @@ def speak(self: Event, speaker_or_style: str, text, text_position: Point | Align
 
     if 'no_block' in flags:
         text += '{no_wait}'
-    cursor = True if draw_cursor is None else draw_cursor
 
+    # Leave draw_cursor as None if unspecified, so that it doesn't override
+    # the draw_cursor of the style we're about to resolve. __default supplies True
     manual_style = SpeakStyle(None, None, text_position, width, text_speed, font_color,
-                              font_type, dialog_box, num_lines, cursor, message_tail,
+                              font_type, dialog_box, num_lines, draw_cursor, message_tail,
                               transparency, name_tag_bg, boop_sound, flags)
 
     style = self._resolve_speak_style(speaker_or_style, style_nid, manual_style)
@@ -707,7 +709,7 @@ def enable_turnwheel(self: Event, activated: bool, flags=None):
 def enable_fog_of_war(self: Event, activated: bool, flags=None):
     action.do(action.SetLevelVar("_fog_of_war", activated))
 
-def set_fog_of_war(self: Event, fog_of_war_type: str, radius: int, ai_radius: Optional[int] = None, other_radius: Optional[int] = None, flags=None):
+def set_fog_of_war(self: Event, fog_of_war_type: str, radius: int, ai_radius: Optional[int] = None, other_radius: Optional[int] = None, fog_of_war_color: Optional[str] = None, flags=None):
     fowt = fog_of_war_type.lower()
     if fowt == 'gba':
         fowt = FogOfWarType.GBA
@@ -723,6 +725,15 @@ def set_fog_of_war(self: Event, fog_of_war_type: str, radius: int, ai_radius: Op
         action.do(action.SetLevelVar('_ai_fog_of_war_radius', ai_radius))
     if other_radius is not None:
         action.do(action.SetLevelVar('_ai_fog_of_war_radius', other_radius))
+    if fog_of_war_color is not None:
+        fowc = fog_of_war_color.lower()
+        if fowc == 'white':
+            fowc = FogOfWarColor.WHITE
+        else:
+            fowc = FogOfWarColor.BLACK
+    else:
+        fowc = FogOfWarColor.BLACK
+    action.do(action.SetLevelVar('_fog_of_war_color', fowc))
 
 def end_turn(self: Event, team: NID = None, flags=None):
     self.logger.info('Force end of turn.')
@@ -1232,6 +1243,17 @@ def interact_unit(self: Event, unit, position, combat_script: Optional[List[str]
         arena='arena' in flags, force_animation='force_animation' in flags, force_no_animation='force_no_animation' in flags)
     self.state = "paused"
 
+def set_combat_script(self: Event, combat_script: List[str], flags=None):
+    flags = flags or set()
+
+    # Currently in 'event' state, 'combat' state should be preceding
+    combat_state = self.game.state.get_prev_state()
+    if combat_state.name != 'combat':
+        self.logger.error("set_combat_script: Current game state is not combat state")
+        return
+
+    combat_state.combat.state_machine.script = list(reversed(combat_script))
+
 def pose_unit(self: Event, unit, pose, direction=None, flags=None):
     from app.events.event_validators import SpritePose, SpriteDirection
     flags = flags or set()
@@ -1294,7 +1316,7 @@ def set_current_hp(self: Event, unit, hp: int, flags=None):
         return
 
     if 'damage_numbers' in flags and actor.position:
-        difference: int = unit.get_hp() - hp
+        difference: int = actor.get_hp() - hp
         actor.sprite.add_damage_number(difference)
 
     action.do(action.SetHP(actor, hp))
@@ -1388,26 +1410,46 @@ def has_visited(self: Event, unit, flags=None):
     if not actor:
         self.logger.error("has_visited: Couldn't find unit %s" % unit)
         return
+    
+    # Set the appropriate action state
     if 'attacked' in flags:
         action.do(action.HasAttacked(actor))
     else:
         action.do(action.HasTraded(actor))
-    if self.game.check_alive(unit):
-        if skill_system.has_canto(actor, None):
-            self.game.cursor.set_pos(actor.position)
-            self.game.state.change('move')
-            self.game.cursor.place_arrows()
-        else:
-            self.game.state.clear()
-            self.game.state.change('free')
-            actor.wait()
-    self.state = 'paused'
+    
+    # Check if the level has ended or is ending to prevent crashes
+    if (self.game.level_vars.get('_win_game') or 
+        self.game.level_vars.get('_lose_game') or 
+        self.game.level_vars.get('_level_end_triggered')):
+        self.logger.info("has_visited: Level ending, skipping action for unit %s" % unit)
+        return
+    
+    # Check if the unit is still alive and valid
+    # Must use actor.nid -- Python eventing hands us a unit object, not a nid
+    if not self.game.check_alive(actor.nid):
+        self.logger.info("has_visited: Unit %s is no longer alive, skipping action" % unit)
+        return
+    
+    # Handle canto properly - follow the Rescue/Drop pattern exactly
+    if skill_system.has_canto(actor, None):
+        # Critical: Set the cursor unit so MoveState recognizes this as a canto situation
+        self.game.cursor.cur_unit = actor
+        self.game.cursor.set_pos(actor.position)
+        action.do(action.SetMovementLeft(actor, skill_system.canto_movement(actor, None)))
+        self.game.cursor.place_arrows()
+        self.game.level_vars['_go_to_state'] = 'move'
+    else:
+        # Use the action system for proper turnwheel recording
+        self.game.state.change('free')
+        self.game.cursor.set_pos(actor.position)
+        action.do(action.Wait(actor))
 
 def has_finished(self: Event, unit, flags=None):
     actor = self._get_unit(unit)
     if not actor:
         self.logger.error("has_finished: Couldn't find unit %s" % unit)
         return
+    action.do(action.Wait(actor))
 
 def add_group(self: Event, group, starting_group=None, entry_type=None, placement=None, flags=None):
     flags = flags or set()
@@ -2392,6 +2434,12 @@ def set_mode_rng(self: Event, rng: str, flags=None):
         return
     self.game.current_mode.rng_mode = RNGOption(new_mode)
 
+def set_mode_permadeath(self: Event, permadeath: bool, flags=None):
+    flags = flags or set()
+    
+    self.game.current_mode.permadeath = permadeath
+
+
 def promote(self: Event, global_unit, klass_list: Optional[List[NID]] = None, flags=None):
     flags = flags or set()
     unit = self._get_unit(global_unit)
@@ -2695,7 +2743,7 @@ def remove_market_item(self: Event, item, stock: int=0, flags=None):
 def clear_market_items(self: Event, flags=None):
     self.game.market_items.clear()
 
-def add_region(self: Event, region, position, size: Tuple, region_type, string=None, time_left=None, hide_time=False, flags=None):
+def add_region(self: Event, region, position, size: Tuple, region_type, string=None, time_left=None, hide_time=False, highlight = None, flags=None):
     flags = flags or set()
 
     if region in self.game.level.regions:
@@ -2711,6 +2759,12 @@ def add_region(self: Event, region, position, size: Tuple, region_type, string=N
     new_region.position = position
     new_region.size = size
     new_region.sub_nid = sub_region_type
+    new_region.highlight = None
+    if highlight is not None and highlight != regions.RegionHighlight.NONE:
+        if highlight in list(regions.RegionHighlight):
+            new_region.highlight = highlight
+        else:
+            self.logger.warning("Could not find highlight anim %s%s", "highlight_", highlight)
     new_region.time_left = time_left
     new_region.hide_time = hide_time
 
@@ -2780,7 +2834,7 @@ def remove_weather(self: Event, weather, position=None, flags=None):
     pos = self._parse_pos(position) if position else None
     action.do(action.RemoveWeather(nid, pos))
 
-def change_objective_simple(self: Event, evaluable_string, flags=None):
+def change_objective_simple(self: Event, evaluable_string="", flags=None):
     action.do(action.ChangeObjective('simple', evaluable_string))
 
 def change_objective_win(self: Event, evaluable_string, flags=None):
@@ -2929,7 +2983,7 @@ def prep(self: Event, pick_units_enabled: bool = False, music: SongPrefab | Song
         options_descs = other_options_description or []
 
         if len(options_enabled) <= len(options_list):
-            options_enabled += [False] * (len(options_list) - len(options_enabled))
+            options_enabled += [True] * (len(options_list) - len(options_enabled))
             action.do(action.SetGameVar('_prep_options_enabled', options_enabled))
         else:
             self.logger.error("prep: too many bools in option enabled list: ", other_options_enabled)
@@ -2980,7 +3034,7 @@ def base(self: Event, background: str, music: SongPrefab | SongObject | NID = No
         options_events = other_options_on_select or []
 
         if len(options_enabled) <= len(options_list):
-            options_enabled += [True] * (len(options_list) - len(options_events))
+            options_enabled += [True] * (len(options_list) - len(options_enabled))
             action.do(action.SetGameVar('_base_options_disabled', [not b for b in options_enabled]))
         else:
             self.logger.error("base: too many bools in option enabled list: ", other_options_enabled)
@@ -3006,28 +3060,36 @@ def base(self: Event, background: str, music: SongPrefab | SongObject | NID = No
     self.game.state.change('base_main')
     self.state = 'paused'
 
-def set_custom_options(self: Event, custom_options: List[str], custom_options_enabled: List[bool] = None,
-                       custom_options_desc: List[str] = None, custom_options_on_select: List[str] = None, flags=None):
+def set_custom_options(
+    self: Event,
+    custom_options: Optional[List[str]],
+    custom_options_enabled: Optional[List[bool]] = None,
+    custom_options_desc: Optional[List[str]] = None,
+    custom_options_on_select: Optional[List[str]] = None,
+    flags: Optional[set[str]] = None
+) -> None:
+    
     flags = flags or set()
 
     options_list = custom_options or []
     options_enabled = custom_options_enabled or []
     options_desc = [option + '_desc' for option in options_list]
+    options_desc_str = custom_options_desc or []
     options_events = custom_options_on_select or []
 
     if len(options_enabled) <= len(options_list):
-        options_enabled += [True] * (len(options_list) - len(options_events))
+        options_enabled += [True] * (len(options_list) - len(options_enabled))
         action.do(action.SetGameVar('_custom_options_disabled', [not b for b in options_enabled]))
     else:
         self.logger.error("set_custom_options: too many bools in option enabled list: ", custom_options_enabled)
         return
 
-    if len(custom_options_desc) <= len(options_events):
-        for idx, desc in enumerate(custom_options_desc):
+    if len(options_desc_str) <= len(options_list):
+        for idx, desc in enumerate(options_desc_str):
             options_desc[idx] = desc
         action.do(action.SetGameVar('_custom_info_desc', options_desc))
     else:
-        self.logger.error("set_custom_options: too many descriptions in option description list: ", custom_options_desc)
+        self.logger.error("set_custom_options: too many descriptions in option description list: ", options_desc_str)
         return
 
     if len(options_events) <= len(options_list):
@@ -3145,7 +3207,7 @@ def unchoice(self: Event, flags=None):
     except Exception as e:
         self.logger.error("unchoice: Unchoice failed: " + str(e))
 
-def textbox(self: Event, nid: str, text: str, box_position: Point | Alignments=None,
+def textbox(self: Event, nid: str, text: str, box_position: Point | Alignments = None,
             width=None, num_lines=None, style_nid=None, text_speed=None,
             font_color=None, font_type=None, bg=None, flags=None):
     flags = flags or set()
@@ -3227,7 +3289,8 @@ def textbox(self: Event, nid: str, text: str, box_position: Point | Alignments=N
                     self.logger.error("textbox: failed to eval %s", callback_expr)
                     return ""
             expr = lambda: tryexcept(text)
-        except:
+        except Exception as e:
+            self.logger.exception(e)
             self.logger.error('textbox: %s is not a valid python expression' % text)
         textbox = dialog.DynamicDialogWrapper(
             expr, background=box_bg, position=position, width=box_width,
@@ -3495,6 +3558,23 @@ def open_unit_management(self: Event, panorama=None, flags=None):
         self.game.state.change('base_manage')
     else:
         self.game.memory['next_state'] = 'base_manage'
+        self.game.state.change('transition_to')
+
+def open_unit_info_screen(self: Event, unit, flags=None):
+    flags = flags or set()
+
+    unit_obj = self._get_unit(unit)
+    if not unit_obj:
+        self.logger.error("open_unit_info_screen: Could not find unit %s" % unit)
+        return
+
+    self.game.memory['current_unit'] = unit_obj
+
+    self.state = "paused"
+    if 'immediate' in flags:
+        self.game.state.change('info_menu')
+    else:
+        self.game.memory['next_state'] = 'info_menu'
         self.game.state.change('transition_to')
 
 def open_trade(self: Event, unit1, unit2, flags=None):
@@ -3954,6 +4034,9 @@ def unlock_difficulty(self: Event, difficulty_mode: str, flags=None):
 
 def unlock_song(self: Event, music: str, flags=None):
     RECORDS.unlock_song(music)
+
+def unlock_support_room(self: Event, flags=None):
+    RECORDS.unlock_support_room()
 
 def hide_combat_ui(self: Event, flags=None):
     self.game.game_vars["_hide_ui"] = True

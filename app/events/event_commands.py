@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import logging
 from enum import Enum
-from typing import Callable, List, Dict, Optional, Set, Tuple, Type
+from typing import Callable, List, Dict, Optional, Self, Set, Tuple, Type
 from app.events.event_version import EventVersion
 from app.events.event_structs import EOL, EventCommandTokens
 
@@ -63,7 +63,7 @@ class EventCommand(Prefab):
             else:
                 self.display_values = []
 
-    def set_flags(self, *args) -> EventCommand:
+    def set_flags(self, *args: str) -> Self:
         self.chosen_flags |= set(args)
         return self
 
@@ -549,8 +549,8 @@ Automatically formats all `speak` commands with NID equal to the style's NID wit
 
 A style consists of all parameters that one can apply to individual speak commands, including flags.
 
-NOTE: Speak styles persist through events. If you load your speak styles in the `on_title_screen` trigger, you will be able to use them
-throughout the entire game.
+NOTE: Speak styles persist through events. It's recommended to load your speak styles in the `on_startup` trigger,
+so you will be able to use them throughout the entire game, even during *Test Event* or *Support Room*.
 
 NOTE: You can set the `__default` speak style, which will automatically apply to all speak commands thereafter.
 """
@@ -1041,8 +1041,8 @@ Sets the fog of war state for the current level.
         """
 
     keywords = ["FogOfWarType", "Radius"]
-    optional_keywords = ["AIRadius", "OtherRadius"]
-    keyword_types = ["FogOfWarType", "PositiveInteger", "PositiveInteger", "PositiveInteger"]
+    optional_keywords = ["AIRadius", "OtherRadius", "FogOfWarColor"]
+    keyword_types = ["FogOfWarType", "PositiveInteger", "PositiveInteger", "PositiveInteger", "FogOfWarColor"]
 
 class EndTurn(EventCommand):
     nid = 'end_turn'
@@ -1432,6 +1432,14 @@ The *immediate* flag will cause the combat to happen as quickly as possible, oft
     optional_keywords = ["CombatScript", "Ability", "Rounds"]
     keyword_types = ["Unit", "Position", "CombatScript", "Ability", "PositiveInteger"]
     _flags = ["arena", "force_animation", "force_no_animation", "immediate"]
+
+class SetCombatScript(EventCommand):
+    nid = 'set_combat_script'
+    tag = Tags.ADD_REMOVE_INTERACT_WITH_UNITS
+
+    desc = "Modify the current combat with a combat script."
+
+    keywords = ["CombatScript"]
 
 class PoseUnit(EventCommand):
     nid = 'pose_unit'
@@ -2379,6 +2387,20 @@ Cannot be undone by the turnwheel.
     keywords = ["rng"]
     keyword_types = ["RNGType"]
 
+class SetModePermadeath(EventCommand):
+    nid = 'set_mode_permadeath'
+    tag = Tags.GAME_VARS
+
+    desc = \
+       """
+changes if permadeath is active in the game.
+Cannot be undone by the turnwheel.
+        """
+
+    keywords = ['Permadeath']
+    keyword_types = ["Bool"]
+
+
 class Promote(EventCommand):
     nid = 'promote'
     tag = Tags.MODIFY_UNIT_PROPERTIES
@@ -2630,8 +2652,8 @@ When set, the *only_once* flag applies only to event region, preventing them fro
         """
 
     keywords = ["Region", "Position", "Size", "RegionType"]
-    optional_keywords = ["String", "TimeLeft", "HideTime"]
-    keyword_types = ["Region", "Position", "Size", "RegionType", "String", "PositiveInteger", "Bool"]
+    optional_keywords = ["String", "TimeLeft", "HideTime", "Highlight"]
+    keyword_types = ["Region", "Position", "Size", "RegionType", "String", "PositiveInteger", "Bool", "HighlightType"]
     _flags = ["only_once", "interrupt_move"]
 
 class RegionCondition(EventCommand):
@@ -2724,7 +2746,7 @@ class ChangeObjectiveSimple(EventCommand):
 Changes the simple version of the chapter's objective text to *EvaluableString*.
         """
 
-    keywords = ["EvaluableString"]
+    optional_keywords = ["EvaluableString"]
 
 class ChangeObjectiveWin(EventCommand):
     nid = 'change_objective_win'
@@ -2844,7 +2866,7 @@ Optional args:
 * *OtherOptions* is a list of strings (Option1, Option2, Option3) that specify additional option names to display in the base.
 * *OtherOptionsEnabled* is a list of string bools (e.g. true, false, false) that specify which of the OtherOptions are enabled. If blank, all OtherOptions will be enabled by default.
 * *OtherOptionsOnSelect* is a list of Event NIDs or Event Names. These events will be triggered when the corresponding OtherOptions are selected.
-* *OtherOptionsDesciption* is a list of strings that provide description to the Option in gba prep screen.
+* *OtherOptionsDesciption* is a list of strings that provide description to the Option in specifically the GBA version of the prep screen.
 
 Flags:
 * *gba* uses gba prep screen layout instead.
@@ -2944,7 +2966,7 @@ What is the difference? The Python Expression will be constantly updated, which 
 **NOTE: Use the flags to determine the correct type.**
 
 **NOTE:** You can use the `|` delimiter to mark a distinction between the nid of a choice, and the text of a choice, if the nid is not meant to be read.
-For example, suppose you give the player a choice between two klasses, and these klasses are called ArmorKnight\_Sun and ArmorKnight\_Moon. Obviously, you don't
+For example, suppose you give the player a choice between two klasses, and these klasses are called ArmorKnight_Sun and ArmorKnight_Moon. Obviously, you don't
 want the player to be forced to read the weird nid. You can instead populate the choices like so:
 
 `choice;ClassSelection;Choose Class; ArmorKnight_Sun|Solar Knight,ArmorKnight_Moon|Lunar Knight;...`
@@ -3247,6 +3269,21 @@ The (*Scroll*) flag determines whether the background image will move.
     optional_keywords = ['Panorama']
     keyword_types = ['Panorama']
     _flags = ["scroll", "immediate"]
+
+class OpenUnitInfoScreen(EventCommand):
+    nid = 'open_unit_info_screen'
+    tag = Tags.MISCELLANEOUS
+
+    desc = \
+        """
+Displays the unit's stat/info screen for the given unit, as if it were viewed from the unit menu.
+
+1. *immediate* flag skips the transition between screens
+        """
+
+    keywords = ['Unit']
+    keyword_types = ['Unit']
+    _flags = ["immediate"]
 
 class OpenTrade(EventCommand):
     nid = 'open_trade'
@@ -3660,7 +3697,7 @@ class UpdateAchievement(EventCommand):
 class CompleteAchievement(EventCommand):
     nid = 'complete_achievement'
     tag = Tags.ACHIEVEMENT
-    desc = ('True marks the achievement as complete. False marks it as incomplete. No effect if achievement doesn\'t exist.\n\nYou can check an achievement\'s completion status with `check_achievement("nid")`\n\nbanner flag determines whether a pop-up box will appear notifying the player.')
+    desc = ('True marks the achievement as complete. False marks it as incomplete. No effect if achievement doesn\'t exist.\n\nYou can check an achievement\'s completion status with `has_achievement("nid")`\n\nbanner flag determines whether a pop-up box will appear notifying the player.')
 
     keywords = ['Achievement', 'Completed']
     keyword_types = ['Achievement', 'Bool']
@@ -3715,6 +3752,12 @@ class UnlockSong(EventCommand):
 
     keywords = ['Music']
     keyword_types = ['Music']
+
+class UnlockSupportRoom(EventCommand):
+    nid = 'unlock_support_room'
+    tag = Tags.PERSISTENT_RECORDS
+    desc = ("Allows Support Room to be viewed from Title Screen > Extras."
+            "Once unlocked, Support Room will remain opened permanently across all save files.")
 
 class PartyTransfer(EventCommand):
     nid = 'party_transfer'
