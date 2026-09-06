@@ -1,0 +1,19 @@
+[
+    {
+        "name": "Intro",
+        "trigger": "level_start",
+        "level_nid": "0",
+        "condition": "True",
+        "commands": [],
+        "only_once": false,
+        "priority": 20,
+        "_source": [
+            "add_portrait;Suzuka;Left;no_block",
+            "add_portrait;Maruzensky;Right",
+            "speak;Silence;Is...is it really happening?",
+            "remove_portrait;Maruzensky;no_block",
+            "remove_portrait;Seth"
+        ],
+        "nid": "0 Intro"
+    }
+]

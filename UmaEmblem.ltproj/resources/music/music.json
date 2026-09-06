@@ -3,96 +3,112 @@
         "Chapter Sound",
         false,
         false,
-        0
+        0,
+        "Chapter Sound"
     ],
     [
         "Distant Roads",
         false,
         false,
-        0
+        0,
+        "Distant Roads"
     ],
     [
         "Quiet Burn",
         false,
         true,
-        0
+        0,
+        "Quiet Burn"
     ],
     [
         "Shadow of the Enemy",
         false,
         false,
-        0
+        0,
+        "Shadow of the Enemy"
     ],
     [
         "Main Theme",
         false,
         false,
-        0
+        0,
+        "Main Theme"
     ],
     [
         "Grasp at Victory",
         false,
         false,
-        0
+        0,
+        "Grasp at Victory"
     ],
     [
         "Attack",
         false,
         false,
-        0
+        0,
+        "Attack"
     ],
     [
         "Defense",
         false,
         false,
-        0
+        0,
+        "Defense"
     ],
     [
         "The Battle Must Be Won",
         false,
         false,
-        0
+        0,
+        "The Battle Must Be Won"
     ],
     [
         "Healing",
         false,
         false,
-        0
+        0,
+        "Healing"
     ],
     [
         "Combat Preparation",
         false,
         false,
-        0
+        0,
+        "Combat Preparation"
     ],
     [
         "Shops",
         false,
         false,
-        0
+        0,
+        "Shops"
     ],
     [
         "Armory",
         false,
         false,
-        0
+        0,
+        "Armory"
     ],
     [
         "Game Over",
         false,
         false,
-        0
+        0,
+        "Game Over"
     ],
     [
         "In Sorrows Shroud",
         false,
         false,
-        0
+        0,
+        "In Sorrows Shroud"
     ],
     [
         "To A Higher Place",
         false,
         false,
-        0
+        0,
+        "To A Higher Place"
     ]
 ]
