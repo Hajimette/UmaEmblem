@@ -2625,6 +2625,7 @@
         ],
         "blink_frames": 2,
         "mouth_frames": 3
+<<<<<<< HEAD
     },
     {
         "nid": "Tabaru",
@@ -2699,5 +2700,7 @@
         ],
         "blink_frames": 2,
         "mouth_frames": 3
+=======
+>>>>>>> 0fb6d6752e6a514b9e0a10f038da5e9ab7f13028
     }
 ]
