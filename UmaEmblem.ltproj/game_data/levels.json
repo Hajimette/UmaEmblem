@@ -129,11 +129,13 @@
         "tilemap": "1",
         "bg_tilemap": null,
         "party": "Eirika",
-        "music": {},
+        "music": {
+            "player_phase": "Touhou 6 - Beloved Tomboyish Girl {Pikmin1211}"
+        },
         "objective": {
             "simple": "",
-            "win": "",
-            "loss": ""
+            "win": "Engage",
+            "loss": "Kitasan DIES"
         },
         "roam": false,
         "roam_unit": null,
@@ -1044,6 +1046,7 @@
                     1
                 ],
                 "sub_nid": "",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1062,6 +1065,7 @@
                     1
                 ],
                 "sub_nid": "",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1080,6 +1084,7 @@
                     1
                 ],
                 "sub_nid": "",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1098,6 +1103,7 @@
                     1
                 ],
                 "sub_nid": "",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1116,6 +1122,7 @@
                     1
                 ],
                 "sub_nid": "",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1134,6 +1141,7 @@
                     1
                 ],
                 "sub_nid": "",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1152,6 +1160,7 @@
                     1
                 ],
                 "sub_nid": "",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1170,6 +1179,7 @@
                     1
                 ],
                 "sub_nid": "Visit",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
@@ -1188,6 +1198,7 @@
                     1
                 ],
                 "sub_nid": "Destructible",
+                "highlight": null,
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
@@ -1206,6 +1217,7 @@
                     1
                 ],
                 "sub_nid": "Visit",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
@@ -1224,6 +1236,7 @@
                     1
                 ],
                 "sub_nid": "Destructible",
+                "highlight": null,
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
@@ -1242,6 +1255,7 @@
                     1
                 ],
                 "sub_nid": "Visit",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
@@ -1260,6 +1274,7 @@
                     1
                 ],
                 "sub_nid": "Destructible",
+                "highlight": null,
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
@@ -1278,6 +1293,7 @@
                     1
                 ],
                 "sub_nid": "Visit",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": true,
@@ -1296,6 +1312,7 @@
                     1
                 ],
                 "sub_nid": "Destructible",
+                "highlight": null,
                 "condition": "unit.team == 'enemy'",
                 "time_left": null,
                 "only_once": true,
@@ -1314,6 +1331,7 @@
                     1
                 ],
                 "sub_nid": "Vendor",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,
@@ -1332,6 +1350,7 @@
                     1
                 ],
                 "sub_nid": "Armory",
+                "highlight": null,
                 "condition": "True",
                 "time_left": null,
                 "only_once": false,

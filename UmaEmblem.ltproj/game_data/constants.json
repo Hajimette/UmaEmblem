@@ -56,10 +56,6 @@
         false
     ],
     [
-        "support",
-        false
-    ],
-    [
         "overworld",
         true
     ],
@@ -212,12 +208,20 @@
         false
     ],
     [
+        "enable_rating",
+        true
+    ],
+    [
         "show_abilities",
         false
     ],
     [
         "info_menu_blink",
         false
+    ],
+    [
+        "droppable_icon",
+        true
     ],
     [
         "convoy_on_death",
@@ -282,6 +286,14 @@
     [
         "title_sound",
         true
+    ],
+    [
+        "title_credits",
+        true
+    ],
+    [
+        "title_full_support",
+        false
     ],
     [
         "music_main",

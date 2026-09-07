@@ -656,7 +656,7 @@
         "wexp_gain": {},
         "alternate_classes": [],
         "portrait_nid": "Haru Urara ver.2",
-        "affinity": null,
+        "affinity": "None",
         "fields": []
     },
     {
@@ -1715,7 +1715,7 @@
         "unit_notes": [],
         "wexp_gain": {},
         "alternate_classes": [],
-        "portrait_nid": "",
+        "portrait_nid": "Tabaru",
         "affinity": null,
         "fields": []
     },
