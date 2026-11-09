@@ -112,12 +112,27 @@
         "autotiles": {}
     },
     {
-        "nid": "03000401",
+        "nid": "Village",
         "terrain_grid": {},
         "autotiles": {}
     },
     {
         "nid": "uma3",
+        "terrain_grid": {},
+        "autotiles": {}
+    },
+    {
+        "nid": "03000401_1",
+        "terrain_grid": {},
+        "autotiles": {}
+    },
+    {
+        "nid": "Green Raw Tiles",
+        "terrain_grid": {},
+        "autotiles": {}
+    },
+    {
+        "nid": "FF2 Town",
         "terrain_grid": {},
         "autotiles": {}
     }
